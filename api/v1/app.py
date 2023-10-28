@@ -11,10 +11,12 @@ app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.register_blueprint(app_views)
 
+
 @app.teardown_appcontext
 def tear_close():
     """closes the storage on teardown"""
     storage.close()
+
 
 if __name__ == "__main__":
     host = environ.get('HBNB_API_HOST')
