@@ -4,7 +4,7 @@
 from flask import Flask, Blueprint
 from models import storage
 from api.v1.views import app_views
-import os
+from os import environ
 
 
 app = Flask(__name__)
@@ -19,6 +19,7 @@ def tear_close(error):
 
 
 if __name__ == "__main__":
+    """main"""
     host = environ.get('HBNB_API_HOST')
     port = environ.get('HBNB_API_PORT')
     if not host:
