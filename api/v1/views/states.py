@@ -3,13 +3,12 @@
 Create a new view for State objects
 """
 from flask import abort, app, jsonify, make_response, request
-import models
-from models.state import State, state
-from models.base_model import BaseModel, Base
+from models.state import State
 from models import storage
+from api.v1.views import app_views
 
 @app.route('/states', methods=['GET'], strict_slashes=False)
-def GET_all_states():
+def get_all_states():
     """get all states"""
     new_states = []
     for state in storage.all(State).values():
@@ -17,7 +16,7 @@ def GET_all_states():
     return jsonify(new_states)
 
 @app.route('/states/<state_id>', methods=['GET'], strict_slashes=False)
-def GET_state(state_id):
+def get_state(state_id):
     """ get state by id"""
     state = storage.get(State ,state_id)
     if State.state_id is None:
@@ -26,10 +25,10 @@ def GET_state(state_id):
         return jsonify(state.to_dict())
     
 @app.route('/states/<state_id>', methods=['DELETE'], strict_slashes=False)
-def DELETE_state(state_id):
+def delete_state(state_id):
     """ get state by id"""
     state = storage.get(State ,state_id)
-    if State.state_id is None:
+    if state is None:
         abort(404)
     else:
         storage.delete(state)
@@ -37,10 +36,14 @@ def DELETE_state(state_id):
         return jsonify({}), 200
 
 @app.route('/states', methods=['POST'], strict_slashes=False)
-def POST_state(states_name):
-    if not request.get_json or not 'states_name' in request.get_json:
+def post_state():
+    """create new state"""
+    if not request.get_json:
         abort(400, 'Not a JSON')
-    elif  not 'states_name' in request.get_json:
+    data = request.get_json()
+    if 'name' not in data:
         abort(400, 'Missing name')
-    else:
-        
+    state = State(**data)
+    state.save()
+    
+    return jsonify(state.to_dict()), 201
