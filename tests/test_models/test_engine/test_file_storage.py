@@ -120,3 +120,11 @@ class TestFileStorage(unittest.TestCase):
         self.storage = FileStorage()
         result = self.storage.get("Amenity", 1)
         self.assertNotNone(result)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing db storage")
+    def test_get(self):
+        def test_count(self, cls=None):
+            if not cls:
+                self.assertEqual(self.count(), 0)
+            else:
+                self.assertNotEqual(self.count(), 0)
