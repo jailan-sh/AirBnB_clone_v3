@@ -20,6 +20,7 @@ def tear_close(error):
 
 @app.errorhandler(404)
 def not_found(error):
+    """error not found"""
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
