@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-RESTFUL API from amenity
-"""
+"""  RESTFUL API from amenity  """
 
 from api.v1.views import app_views
 from flask import abort, jsonify, make_response, request
@@ -42,7 +40,7 @@ def delete_amenity_object(state_id):
 
 @app_views.route('/amenities', methods=['POST'], strict_slashes=False)
 def create_amenity_object():
-    """ Create an Amenity object """
+    """ Create  Amenity object """
     if not request.get_json():
         abort(400, description="Not a JSON")
     elif 'name' not in request.get_json():
