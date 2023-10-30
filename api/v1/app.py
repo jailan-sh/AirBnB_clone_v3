@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 """ app model """
 
-from flask import Flask, Blueprint, make_response, jsonify, CORS
+from flask import Flask, Blueprint, make_response, jsonify
+from flask_cors import CORS
 from models import storage
 from api.v1.views import app_views
 from os import environ
