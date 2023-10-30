@@ -10,57 +10,58 @@ from api.v1.views import app_views
 @app_views.route('/amenities', method=['GET'], strict_slashes=False)
 def get_all_amenity():
     """to get all amenity"""
-    all_objects = storage.all(Amenity).values()
-    amenities = []
-    for one in all_objects:
-        amenities.append(one.to_dict())
-        return make_response(jsonify(amenities), 200)
+    all_amenities = storage.all(Amenity).values()
+    list_amenities = []
+    for amenity in all_amenities:
+        list_amenities.append(amenity.to_dict())
+    return jsonify(list_amenities)
 
 
 @app_views.route('/amenities/<amenity_id>', method=['GET'],
                  strict_slashes=False)
 def one_amenity(amenity_id):
     """return one object"""
-    obj = storage.get(Amenity, amenity_id)
-    if not obj:
+    amenity = storage.get(Amenity, amenity_id)
+    if not amenity:
         abort(404)
-    else:
-        return make_response(jsonify(obj.to_dict()), 200)
+    return jsonify(amenity.to_dict())
 
 
 @app_views.route('/amenities/<amenity_id>', method=['DELETE'],
                  strict_slashes=False)
-def remove(amenity_id):
+def remove_amenity(amenity_id):
     """remove item"""
-    out = storage.get(Amenity, amenity_id)
-    if not out:
+    amenity = storage.get(Amenity, amenity_id)
+
+    if not amenity:
         abort(404)
-    else:
-        storage.delete(out)
-        storage.save()
-    return make_response({}, 200)
+
+    storage.delete(amenity)
+    storage.save()
+    return make_response(jsonify({}), 200)
 
 
 @app_views.route('/amenities', method=['POST'], strict_slashes=False)
-def add():
-    """add amenity object"""
+def add_amenity():
     if not request.get_json():
-        return make_response("Not a JSON", 400)
+        abort(400, description="Not a JSON")
+
     if 'name' not in request.get_json():
-        return make_response("Missing name", 400)
+        abort(400, description="Missing name")
 
     data = request.get_json()
-    addition = Amenity(**data)
-    addition.save()
-    return make_response(jsonify(addition.to_dict()), 201)
+    instance = Amenity(**data)
+    instance.save()
+    return make_response(jsonify(instance.to_dict()), 201)
 
 
 @app_views.route('/amenities/<amenity_id>', methods=['PUT'],
                  strict_slashes=False)
 def edit_amenity(amenity_id):
     """update amenity"""
+
     if not request.get_json():
-        return make_response("Not a JSON", 400)
+        abort(400, description="Not a JSON")
 
     ignore = ['id', 'created_at', 'updated_at']
 
