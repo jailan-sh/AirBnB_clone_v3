@@ -31,7 +31,7 @@ def get_user(user_id):
 
 
 @app_views.route('/users/<user_id>', methods=['DELETE'], strict_slashes=False)
-def remove(user_id):
+def remove_user(user_id):
     """ Function delete a User Object """
     the_obj = storage.get(User, user_id)
     if the_obj is None:
@@ -57,7 +57,7 @@ def create_user():
 
 
 @app_views.route('/users/<user_id>', methods=['PUT'], strict_slashes=False)
-def edit(user_id):
+def edit_user(user_id):
     """ Update a User object """
     the_obj = storage.get(User, user_id)
     json_put = request.get_json()
