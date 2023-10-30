@@ -45,7 +45,7 @@ def delete_place(place_id):
     if place:
         storage.delete(place)
         storage.save()
-        return jsonify({}), 200
+        return ({}, 200)
     else:
         abort(404)
 
