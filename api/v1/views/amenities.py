@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """handelling RESTFUL API from amenity"""
 
-from flask import Flask, make_response, jsonify, abort, request
+from flask import make_response, jsonify, abort, request
 from models.amenity import Amenity
 from models import storage
 from api.v1.views import app_views
@@ -14,7 +14,7 @@ def get_all_amenity():
     amenities = []
     for one in all_objects:
         amenities.append(one.to_dict())
-        return jsonify(amenities)
+        return make_response(jsonify(amenities), 200)
 
 
 @app_views.route('/amenities/<amenity_id>', method=['GET'],
@@ -25,7 +25,7 @@ def one_amenity(amenity_id):
     if not obj:
         abort(404)
     else:
-        return jsonify(obj.to_dict())
+        return make_response(jsonify(obj.to_dict()), 200)
 
 
 @app_views.route('/amenities/<amenity_id>', method=['DELETE'],
@@ -38,16 +38,16 @@ def remove(amenity_id):
     else:
         storage.delete(out)
         storage.save()
-    return make_response(jsonify({}, 200))
+    return make_response({}, 200)
 
 
 @app_views.route('/amenities', method=['POST'], strict_slashes=False)
 def add():
     """add amenity object"""
     if not request.get_json():
-        abort(400, description="Not a JSON")
+        return make_response("Not a JSON", 400)
     if 'name' not in request.get_json():
-        abort(400, description="Missing name")
+        return make_response("Missing name", 400)
 
     data = request.get_json()
     addition = Amenity(**data)
@@ -60,7 +60,7 @@ def add():
 def edit_amenity(amenity_id):
     """update amenity"""
     if not request.get_json():
-        abort(400, description="Not a JSON")
+        return make_response("Not a JSON", 400)
 
     ignore = ['id', 'created_at', 'updated_at']
 

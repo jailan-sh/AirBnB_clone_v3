@@ -8,12 +8,13 @@ from os import environ
 
 
 app = Flask(__name__)
+
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.register_blueprint(app_views)
 
 
 @app.teardown_appcontext
-def tear_close(error):
+def tear_close(exception):
     """closes the storage on teardown"""
     storage.close()
 
@@ -22,12 +23,6 @@ def tear_close(error):
 def not_found(error):
     """error not found for error"""
     return make_response(jsonify({'error': 'Not found'}), 404)
-
-
-@app.errorhandler(400)
-def bad_request(error):
-    """bad request error"""
-    return make_response(jsonify({'error': error.description}), 400)
 
 
 if __name__ == "__main__":
