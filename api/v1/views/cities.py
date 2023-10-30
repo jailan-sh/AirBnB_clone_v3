@@ -13,11 +13,11 @@ from models.state import State
     '/states/<state_id>/cities',
     methods=['GET'],
     strict_slashes=False)
-def get_all_cities(state_id):
+def get_cities(state_id):
     """get all cities"""
-    new_cities = []
     state = storage.get(State, state_id)
     if state:
+        new_cities = []
         for city in state.cities:
             new_cities.append(city.to_dict())
         return jsonify(new_cities)
@@ -42,11 +42,12 @@ def get_city(city_id):
 def delete_city(city_id):
     """ get city by id"""
     city = storage.get(City, city_id)
-    if city is None:
+    if city:
+        storage.delete(city)
+        storage.save()
+        return make_response(jsonify({}), 200)
+    else:
         abort(404)
-    storage.delete(city)
-    storage.save()
-    return make_response(jsonify({}), 200)
 
 
 @app_views.route('/cities', methods=['POST'], strict_slashes=False)
@@ -58,11 +59,12 @@ def create_city(state_id):
     if 'name' not in data:
         abort(400, description='Missing name')
     state = storage.get(State, state_id)
-    if state is None:
-        abort(400)
-    data['state_id'] = state_id
-    city = City(**data)
-    city.save()
+    if state :
+        data['state_id'] = state_id
+        city = City(**data)
+        city.save()
+    else:
+        abort(404)
 
     return make_response(jsonify(city.to_dict()), 201)
 
