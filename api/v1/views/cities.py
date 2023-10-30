@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-create a new view for City objects 
+create a new view for City objects
 """
 from flask import abort, app, jsonify, make_response, request
 from models.city import City
@@ -9,7 +9,10 @@ from api.v1.views import app_views
 from models.state import State
 
 
-@app_views.route('/states/<state_id>/cities', methods=['GET'], strict_slashes=False)
+@app_views.route(
+    '/states/<state_id>/cities',
+    methods=['GET'],
+    strict_slashes=False)
 def get_all_cities(state_id):
     """get all cities"""
     new_cities = []
