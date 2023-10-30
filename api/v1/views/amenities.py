@@ -1,71 +1,77 @@
 #!/usr/bin/python3
-"""  RESTFUL API from amenity  """
+"""handelling RESTFUL API from amenity"""
 
-from api.v1.views import app_views
-from flask import abort, jsonify, make_response, request
+from flask import make_response, jsonify, abort, request
 from models.amenity import Amenity
 from models import storage
+from api.v1.views import app_views
 
 
-@app_views.route('/amenities', methods=['GET'], strict_slashes=False)
-def get_amenity_objects():
-    """ Retrieve all Amenity objects """
-    amenity_objs = [a.to_dict() for a in storage.all(Amenity)]
-    return jsonify(amenity_objs)
+@app_views.route('/amenities', method=['GET'], strict_slashes=False)
+def get_all_amenity():
+    """to get all amenity"""
+    all_objects = storage.all(Amenity).values()
+    amenities = []
+    for one in all_objects:
+        amenities.append(one.to_dict())
+        return make_response(jsonify(amenities), 200)
 
 
-@app_views.route('/amenities/<amenity_id>', methods=['GET'],
+@app_views.route('/amenities/<amenity_id>', method=['GET'],
                  strict_slashes=False)
-def get_amenity_object(amenity_id):
-    """ Retrieve a single amenity object matching the given id """
-    try:
-        amenity_obj = storage.get(Amenity, amenity_id).to_dict()
-        return jsonify(amenity_obj)
-    except:
+def one_amenity(amenity_id):
+    """return one object"""
+    obj = storage.get(Amenity, amenity_id)
+    if not obj:
         abort(404)
-
-
-@app_views.route('/amenities/<amenity_id>', methods=['DELETE'],
-                 strict_slashes=False)
-def delete_amenity_object(state_id):
-    """ Delete an Amenity object """
-    try:
-        amenity_obj = storage.get(Amenity, amenity_id)
-        storage.delete(amenity_obj)
-        storage.save()
-        return make_response(jsonify({}), 200)
-    except:
-        abort(404)
-
-
-@app_views.route('/amenities', methods=['POST'], strict_slashes=False)
-def create_amenity_object():
-    """ Create  Amenity object """
-    if not request.get_json():
-        abort(400, description="Not a JSON")
-    elif 'name' not in request.get_json():
-        abort(400, description="Missing name")
     else:
-        content = request.get_json()
-        amenity = Amenity()
-        amenity.name = content['name']
-        amenity.save()
-        return make_response(jsonify(amenity.to_dict()), 201)
+        return make_response(jsonify(obj.to_dict()), 200)
+
+
+@app_views.route('/amenities/<amenity_id>', method=['DELETE'],
+                 strict_slashes=False)
+def remove(amenity_id):
+    """remove item"""
+    out = storage.get(Amenity, amenity_id)
+    if not out:
+        abort(404)
+    else:
+        storage.delete(out)
+        storage.save()
+    return make_response({}, 200)
+
+
+@app_views.route('/amenities', method=['POST'], strict_slashes=False)
+def add():
+    """add amenity object"""
+    if not request.get_json():
+        return make_response("Not a JSON", 400)
+    if 'name' not in request.get_json():
+        return make_response("Missing name", 400)
+
+    data = request.get_json()
+    addition = Amenity(**data)
+    addition.save()
+    return make_response(jsonify(addition.to_dict()), 201)
 
 
 @app_views.route('/amenities/<amenity_id>', methods=['PUT'],
                  strict_slashes=False)
-def update_amenity_object(amenity_id):
-    """ Update the attributes of an Amenity object """
-    amenity_obj = storage.get(Amenity, amenity_id)
-    if amenity_obj is None:
-        abort(404)
+def edit_amenity(amenity_id):
+    """update amenity"""
     if not request.get_json():
-        abort(400, description='Not a JSON')
-    content = request.get_json()
-    nope = ['id', 'created_at', 'updated_at']
-    for key, value in content.items():
-        if key not in nope:
-            setattr(amenity_obj, key, value)
+        return make_response("Not a JSON", 400)
+
+    ignore = ['id', 'created_at', 'updated_at']
+
+    amenity = storage.get(Amenity, amenity_id)
+
+    if not amenity:
+        abort(404)
+
+    data = request.get_json()
+    for key, value in data.items():
+        if key not in ignore:
+            setattr(amenity, key, value)
     storage.save()
-    return make_response(jsonify(amenity_obj.to_dict()), 200)
+    return make_response(jsonify(amenity.to_dict()), 200)
