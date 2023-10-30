@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ app model """
 
-from flask import Flask, Blueprint, make_response, jsonify
+from flask import Flask, Blueprint, make_response, jsonify, CORS
 from models import storage
 from api.v1.views import app_views
 from os import environ
@@ -9,7 +9,7 @@ from os import environ
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
-
+CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 
 @app.teardown_appcontext
 def tear_close(exception):
