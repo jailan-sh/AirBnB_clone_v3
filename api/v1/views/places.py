@@ -9,6 +9,7 @@ from api.v1.views import app_views
 from models.place import Place
 from models.user import User
 
+
 @app_views.route(
     '/cities/<city_id>/places',
     methods=['GET'],
@@ -45,12 +46,15 @@ def delete_place(place_id):
     if place:
         storage.delete(place)
         storage.save()
-        return jsonify({}), 200
+        return ({}, 200)
     else:
         abort(404)
 
 
-@app_views.route('/cities/<city_id>/places', methods=['POST'], strict_slashes=False)
+@app_views.route(
+    '/cities/<city_id>/places',
+    methods=['POST'],
+    strict_slashes=False)
 def create_place(city_id):
     """create new place"""
     city = storage.get(City, city_id)
